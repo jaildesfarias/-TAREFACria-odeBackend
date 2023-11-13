@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Filtrar Produtos</title>
+</head>
+<body>
+  <h2>Filtrar Produtos</h2>
+  <form action="/produtos" method="post">
+    Nome do Vestido: <input type="text" name="nome">
+    <br>
+    Preço Máximo: <input type="number" name="precoMaximo">
+    <input type="submit" value="Filtrar">
+  </form>
+
+  <div id="resultadoBusca"></div>
+
+  <script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const nome = document.querySelector('input[name="nome"]').value;
+      const precoMaximo = document.querySelector('input[name="precoMaximo"]').value;
+
+      fetch('/produtos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `nome=${nome}&precoMaximo=${precoMaximo}`,
+      })
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('resultadoBusca').innerHTML = data;
+      })
+      .catch(error => console.error('Erro:', error));
+    });
+  </script>
+</body>
+</html>
