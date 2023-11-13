@@ -5,7 +5,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 {}
-const sequelize = new Sequelize('lojinha', 'aluno', 'ifpe2023, {
+const sequelize = new Sequelize('lojinha', 'aluno', 'ifpe2023', {
   host: 'localhost',
   dialect: 'mysql',
 });
