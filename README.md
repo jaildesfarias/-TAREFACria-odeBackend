@@ -7,3 +7,4 @@ Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABL
 Executing (default): SHOW INDEX FROM `Produtos`
 Modelo sincronizado com o banco de dados
 Esta aplicação está escutando a porta 3000
+foi a saída.
