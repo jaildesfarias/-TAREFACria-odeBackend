@@ -1,22 +1,30 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const fs = require('fs');
 const { Sequelize, DataTypes } = require('sequelize');
 
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
-{}
-const sequelize = new Sequelize('lojinha', 'aluno', 'ifpe2023', {
+const port = 3009;
+
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: false }));
+
+const sequelize = new Sequelize('lojinha', 'root', 'casa', {
   host: 'localhost',
   dialect: 'mysql',
+  port: 3306,
 });
 
-const Produto = sequelize.define('Produto', {
-  campo: {
-    type: DataTypes.INTEGER,
+const Product = sequelize.define('Product', {
+  codigo: {
+    type: DataTypes.STRING,
     allowNull: false,
-    primaryKey: true,
   },
-  vestido: {
+  nome: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  tamanho: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -24,79 +32,124 @@ const Produto = sequelize.define('Produto', {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
-  marca: {
+  cor: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  material: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 });
 
-const port = 3000;
+sequelize.sync();
 
-app.route('/produtos')
-  .get(async (req, res) => {
-    try {
-      const produtos = await Produto.findAll();
-      let todosProdutos = "";
-      produtos.forEach(produto => {
-        todosProdutos += "Campo " + produto.campo;
-        todosProdutos += " Vestido " + produto.vestido;
-        todosProdutos += " Preço " + produto.preco;
-        todosProdutos += " Marca " + produto.marca;
-        todosProdutos += "<br>";
-      });
-      res.send('<b>Veja nossos produtos</b>' + todosProdutos);
-    } catch (error) {
-      console.error('Erro ao recuperar produtos do banco de dados:', error);
-      res.status(500).send('Erro interno do servidor');
-    }
-  })
-  .post(urlencodedParser, async (req, res) => {
-    try {
-      const nomeFiltro = req.body.nome;
-      const precoMaximo = parseFloat(req.body.precoMaximo);
-
-      const resultadoBusca = await Produto.findAll({
-        where: {
-          vestido: {
-            [Sequelize.Op.like]: `%${nomeFiltro}%`,
-          },
-          preco: {
-            [Sequelize.Op.lte]: precoMaximo,
-          },
-        },
-      });
-
-      let todosProdutos = "";
-      resultadoBusca.forEach(produto => {
-        todosProdutos += "Campo " + produto.campo;
-        todosProdutos += " Vestido " + produto.vestido;
-        todosProdutos += " Preço " + produto.preco;
-        todosProdutos += " Marca " + produto.marca;
-        todosProdutos += "<br>";
-      });
-
-      const novoProduto = await Produto.create({
-        campo: resultadoBusca.length + 1,
-        vestido: req.body.vestido,
-        preco: parseFloat(req.body.preco),
-        marca: req.body.marca,
-      });
-
-      console.log("Novo produto inserido com sucesso!");
-      res.send("<p><b>Bem-vindo à minha lojinha!!</b></br>" + todosProdutos);
-    } catch (error) {
-      console.error('Erro ao buscar ou inserir produtos no banco de dados:', error);
-      res.status(500).send('Erro interno do servidor');
-    }
-  });
-
-sequelize.sync()
+sequelize.authenticate()
   .then(() => {
-    console.log('Modelo sincronizado com o banco de dados');
-    app.listen(port, () => {
-      console.log(`Esta aplicação está escutando a porta ${port}`);
-    });
+    console.log('Conectado ao banco de dados');
   })
-  .catch(error => {
-    console.error('Erro ao sincronizar modelo com o banco de dados:', error);
+  .catch((erro) => {
+    console.error('Erro ao conectar:', erro);
   });
+
+
+app.get('/formulario', (req, res) => {
+  try {
+    const htmlTemplate = fs.readFileSync('formulario.html', 'utf8');
+    res.send(htmlTemplate);
+  } catch (error) {
+    console.error('Erro ao carregar formulário:', error);
+    res.status(500).send('Erro interno no servidor');
+  }
+});
+
+
+app.post('/processar-formulario', async (req, res) => {
+  try {
+    const dadosDoFormulario = req.body;
+
+    const resposta = `
+      <!DOCTYPE html>
+    
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Dados Recebidos do Formulário</title>
+      </head>
+      <body>
+          <h2>Dados Recebidos do Formulário</h2>
+          <table border="1">
+              <tr>
+                  <th>Campo</th>
+                  <th>Valor</th>
+              </tr>
+              <tr>
+                  <td>Codigo</td>
+                  <td>${dadosDoFormulario.codigo}</td>
+              </tr>
+              <tr>
+                  <td>Nome </td>
+                  <td>${dadosDoFormulario.nome}</td>
+              </tr>
+              <tr>
+                  <td>Tamanho</td>
+                  <td>${dadosDoFormulario.tamanho}</td>
+              </tr>
+              <tr>
+                  <td>Preço</td>
+                  <td>${dadosDoFormulario.preco}</td>
+              </tr>
+              <tr>
+                  <td>Cor</td>
+                  <td>
+                    <table border="1">
+                      <tr>
+                        <th>Cor</th>
+                      </tr>
+                      <tr>
+                        <td>${dadosDoFormulario.cor}</td>
+                      </tr>
+                    </table>
+                  </td>
+              </tr>
+              <tr>
+                  <td>Material</td>
+                  <td>${dadosDoFormulario.material}</td>
+              </tr>
+          </table>
+      </body>
+      </html>
+    `;
+
+    res.send(resposta);
+  } catch (error) {
+    console.error('Erro ao processar formulário:', error);
+    res.status(500).send('Erro interno no servidor');
+  }
+});
+
+
+app.post('/insereProdutos', async (req, res) => {
+  try {
+    const dadosDoFormulario = req.body;
+
+    
+    await Product.create({
+      codigo: dadosDoFormulario.codigo,
+      nome: dadosDoFormulario.nome,
+      tamanho: dadosDoFormulario.tamanho,
+      preco: parseFloat(dadosDoFormulario.preco),
+      cor: dadosDoFormulario.cor,
+      material: dadosDoFormulario.material,
+    });
+
+    res.send('Dados inseridos com sucesso!');
+  } catch (error) {
+    console.error('Erro ao processar formulário:', error);
+    res.status(500).send('Erro interno no servidor');
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
+});
