@@ -1,40 +1,41 @@
 <!DOCTYPE html>
 
 <head>
-  <meta charset="UTF-8">
-  <title>Filtrar Produtos</title>
+    <meta charset="UTF-8">
+    <title>Formulário de Inserção de Produtos</title>
 </head>
 <body>
-  <h2>Filtrar Produtos</h2>
-  <form action="/produtos" method="post">
-    Nome do Vestido: <input type="text" name="nome">
-    <br>
-    Preço Máximo: <input type="number" name="precoMaximo">
-    <input type="submit" value="Filtrar">
-  </form>
-
-  <div id="resultadoBusca"></div>
-
-  <script>
-    document.querySelector('form').addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      const nome = document.querySelector('input[name="nome"]').value;
-      const precoMaximo = document.querySelector('input[name="precoMaximo"]').value;
-
-      fetch('/produtos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `nome=${nome}&precoMaximo=${precoMaximo}`,
-      })
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('resultadoBusca').innerHTML = data;
-      })
-      .catch(error => console.error('Erro:', error));
-    });
-  </script>
+    <h1>Formulário de Inserção de Produtos</h1>
+    <form action="/insereProdutos" method="post">
+        <table border="1">
+            <tr>
+                <td>Código do Produto:</td>
+                <td><input type="text" name="codigo" id="codigo"></td>
+            </tr>
+            <tr>
+                <td>Nome do Produto:</td>
+                <td><input type="text" name="nome" id="nome"></td>
+            </tr>
+            <tr>
+                <td>Tamanho:</td>
+                <td><input type="text" name="tamanho" id="tamanho"></td>
+            </tr>
+            <tr>
+                <td>Preço:</td>
+                <td><input type="text" name="preco" id="preco"></td>
+            </tr>
+            <tr>
+                <td>Cor:</td>
+                <td><input type="text" name="cor" id="cor"></td>
+            </tr>
+            <tr>
+                <td>Material:</td>
+                <td><input type="text" name="material" id="material"></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" value="Cadastrar"></td>
+            </tr>
+        </table>
+    </form>
 </body>
 </html>
