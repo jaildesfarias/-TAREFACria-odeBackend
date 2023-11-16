@@ -1,6 +1,10 @@
 # -TAREFACria-odeBackend
- SENHA DO IFPE: 'lojinha', 'aluno', 'ifpe2023,
+ SENHA DO IFPE: 'lojinha', 'root', 'ifpe,
 
- Conectado ao banco de dados
+Usei 
+
+npm install sequelize
+npm install mysql2
+ 
 
 
