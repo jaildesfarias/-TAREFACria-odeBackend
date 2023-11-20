@@ -9,7 +9,7 @@ const port = 3001;
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const sequelize = new Sequelize('lojinha', 'root', 'ifpe', {
+const sequelize = new Sequelize('lojinha', 'aluno', 'ifpe2023', {
   host: 'localhost',
   dialect: 'mysql',
 });
